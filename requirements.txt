@@ -1,0 +1,17 @@
+# Dependências essenciais para o funcionamento do projeto
+parsel==1.10.0       # Manipulação e seleção de elementos HTML/XML para raspagem
+requests==2.32.3     # Requisições HTTP para obter dados da web
+lxml==5.3.1          # Suporte para parsing robusto de HTML/XML (necessário para parsel)
+pdfplumber==0.11.5   # Extração de texto de arquivos PDF
+mysql-connector-python==9.2.0 # Conexão com banco de dados MySQL
+pandas==2.2.3        # Manipulação de dados tabulares
+
+# Dependências para testes
+pytest==8.3.5        # Framework de testes para rodar os casos de teste
+pytest-mock==3.14.0  # Biblioteca para mockar funções e simular comportamento nos testes
+pytest-cov==6.0.0    # Ferramenta para medir cobertura de testes
+coverage==7.7.1      # Ferramenta complementar para relatórios de cobertura detalhada
+
+# Ferramentas para desenvolvimento
+flake8==7.1.2        # Linter para garantir boas práticas e estilo de código
+black==25.1.0        # Formatação automática de código para consistência

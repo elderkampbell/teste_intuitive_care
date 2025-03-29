@@ -72,7 +72,7 @@ Certifique-se de que as informações correspondem ao ambiente de banco de dados
 Para rodar a aplicação, utilize o comando abaixo no terminal, após ativar o ambiente virtual:
 
 ```bash
-python -m main
+python3 -m src.main
 ```
 
 ## Testes Automatizados

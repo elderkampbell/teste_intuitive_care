@@ -1,17 +1,62 @@
-# Dependências essenciais para o funcionamento do projeto
-parsel==1.10.0       # Manipulação e seleção de elementos HTML/XML para raspagem
-requests==2.32.3     # Requisições HTTP para obter dados da web
-lxml==5.3.1          # Suporte para parsing robusto de HTML/XML (necessário para parsel)
-pdfplumber==0.11.5   # Extração de texto de arquivos PDF
-mysql-connector-python==9.2.0 # Conexão com banco de dados MySQL
-pandas==2.2.3        # Manipulação de dados tabulares
+### Frameworks e Microframeworks
+Flask==3.1.0                # Microframework para desenvolvimento web em Python
+flask-cors==5.0.1           # Extensão Flask para suporte a CORS
+Werkzeug==3.1.3             # Biblioteca de utilidades WSGI para Python
 
-# Dependências para testes
-pytest==8.3.5        # Framework de testes para rodar os casos de teste
-pytest-mock==3.14.0  # Biblioteca para mockar funções e simular comportamento nos testes
-pytest-cov==6.0.0    # Ferramenta para medir cobertura de testes
-coverage==7.7.1      # Ferramenta complementar para relatórios de cobertura detalhada
+### Análise de Dados
+pandas==2.2.3               # Biblioteca para análise de dados
+numpy==2.2.4                # Biblioteca para computação numérica
 
-# Ferramentas para desenvolvimento
-flake8==7.1.2        # Linter para garantir boas práticas e estilo de código
-black==25.1.0        # Formatação automática de código para consistência
+### Manipulação de PDFs
+pdfminer.six==20231228      # Ferramenta para extrair informações de PDFs
+pdfplumber==0.11.5          # Biblioteca para trabalhar com PDFs
+pypdfium2==4.30.1           # Biblioteca para manipulação de PDFs
+
+### Banco de Dados
+mysql-connector-python==9.2.0 # Conector MySQL para Python
+PyMySQL==1.1.1              # Conector MySQL para Python
+
+### Testes
+pytest==8.3.5               # Framework de testes para Python
+pytest-cov==6.0.0           # Plugin para cobertura de testes com pytest
+pytest-mock==3.14.0         # Ferramenta de mock para testes com pytest
+
+### Ferramentas de Linting e Estilo
+flake8==7.1.2               # Ferramenta de linting para Python
+mccabe==0.7.0               # Verificador de complexidade ciclomática
+pycodestyle==2.12.1         # Verificador de estilo de código Python
+pyflakes==3.2.0             # Ferramenta de linting para Python
+
+### Criptografia e Segurança
+cryptography==44.0.2        # Biblioteca para criptografia em Python
+itsdangerous==2.2.0         # Ferramenta para criar tokens seguros
+
+### Manipulação de Strings e Dados
+charset-normalizer==3.4.1    # Normalização de conjuntos de caracteres
+jmespath==1.0.1              # Consulta de dados JSON
+pathspec==0.12.1             # Especificação de caminhos para arquivos
+
+### Utilitários
+black==25.1.0                # Formatador de código Python
+click==8.1.8                 # Biblioteca para criação de interfaces de linha de comando
+coverage==7.7.1              # Ferramenta para medir a cobertura de testes
+requests==2.32.3             # Biblioteca para fazer requisições HTTP
+urllib3==2.3.0               # Biblioteca para manipulação de URLs
+w3lib==2.3.1                 # Utilitários para trabalhar com URLs e HTML
+
+### Análise e Processamento de HTML/XML
+lxml==5.3.1                  # Biblioteca para processamento de XML e HTML
+parsel==1.10.0               # Biblioteca para análise de HTML e XML
+
+### Data e Tempo
+python-dateutil==2.9.0.post0 # Manipulação de datas e horários
+pytz==2025.2                 # Biblioteca de fusos horários
+tzdata==2025.2               # Dados de fuso horário
+
+### Outros
+certifi==2025.1.31          # Certificados CA para validação de SSL
+cffi==1.17.1                # Interface de chamada de função C para Python
+iniconfig==2.1.0            # Leitor de arquivos .ini
+MarkupSafe==3.0.2           # Ferramenta para escapar strings
+pluggy==1.5.0               # Sistema de plug-ins para Python
+mypy-extensions==1.0.0      # Extensões para o mypy, verificador de tipos

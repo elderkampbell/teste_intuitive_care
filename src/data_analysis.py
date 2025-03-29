@@ -1,4 +1,4 @@
-import mysql.connector # type: ignore
+import mysql.connector  # type: ignore
 import logging
 
 # Configuração do banco de dados
@@ -10,6 +10,7 @@ db_config = {
     "database": "ans_dados",  # Nome do banco de dados
 }
 
+
 # Função para conectar ao banco de dados MySQL
 def conectar_bd():
     try:
@@ -19,6 +20,7 @@ def conectar_bd():
         # Caso ocorra um erro na conexão, loga o erro
         logging.error(f"Erro ao conectar ao banco de dados: {err}")
         return None
+
 
 # Consulta SQL 1: Top 10 operadoras com maiores despesas no último trimestre
 query_trimestre = """
@@ -98,47 +100,74 @@ ORDER BY total_despesa DESC  # Ordenando pela maior despesa
 LIMIT 10;  # Limitando o resultado aos top 10
 """
 
+
 # Função para executar a query e exibir os resultados
 def executar_query(query, titulo):
     # Conecta ao banco de dados
     conexao = conectar_bd()
     if not conexao:
         return
-    
+
     cursor = conexao.cursor()
     cursor.execute(query)  # Executa a consulta SQL
     resultados = cursor.fetchall()  # Obtém os resultados da consulta
-    
+
     print(f"\n{titulo}")
     print("=" * 50)
-    
+
     # Encontrar a operadora com a maior despesa
     maior_despesa = None
-    for reg_ans, total_despesas, periodo_inicio, periodo_fim, descricao_agregada in resultados:
+    for (
+        reg_ans,
+        total_despesas,
+        periodo_inicio,
+        periodo_fim,
+        descricao_agregada,
+    ) in resultados:
         if maior_despesa is None or total_despesas > maior_despesa[1]:
-            maior_despesa = (reg_ans, total_despesas, periodo_inicio, periodo_fim, descricao_agregada)
-        
+            maior_despesa = (
+                reg_ans,
+                total_despesas,
+                periodo_inicio,
+                periodo_fim,
+                descricao_agregada,
+            )
+
     # Exibir a operadora com maior despesa
-    print(f"Operadora com a maior despesa: {maior_despesa[0]} - R$ {maior_despesa[1]:,.2f} (Período: {maior_despesa[2]} a {maior_despesa[3]})")
+    print(
+        f"Operadora com a maior despesa: {maior_despesa[0]} - R$ {maior_despesa[1]:,.2f} (Período: {maior_despesa[2]} a {maior_despesa[3]})"
+    )
     print("Descrição dos eventos:", maior_despesa[4])
-    
+
     print("=" * 50)
-    
+
     # Exibir o top 10 de operadoras com maiores despesas
-    for reg_ans, total_despesas, periodo_inicio, periodo_fim, descricao_agregada in resultados:
-        print(f"Operadora {reg_ans}: R$ {total_despesas:,.2f} (Período: {periodo_inicio} a {periodo_fim})")
-    
+    for (
+        reg_ans,
+        total_despesas,
+        periodo_inicio,
+        periodo_fim,
+        descricao_agregada,
+    ) in resultados:
+        print(
+            f"Operadora {reg_ans}: R$ {total_despesas:,.2f} (Período: {periodo_inicio} a {periodo_fim})"
+        )
+
     print("=" * 50)
-    
+
     # Fechar o cursor e a conexão com o banco de dados
     cursor.close()
     conexao.close()
 
+
 # Função principal para executar as consultas
 def main():
     # Executa as queries para o último trimestre e ano
-    executar_query(query_trimestre, "Top 10 Operadoras com Maiores Despesas no Último Trimestre")
+    executar_query(
+        query_trimestre, "Top 10 Operadoras com Maiores Despesas no Último Trimestre"
+    )
     executar_query(query_ano, "Top 10 Operadoras com Maiores Despesas no Último Ano")
+
 
 # Execução do script
 if __name__ == "__main__":

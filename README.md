@@ -98,3 +98,33 @@ pytest
   ```bash
   black src/ tests/
   ```
+
+## Resumo dos Desafios ✅
+
+<details>
+<summary>Clique para expandir</summary>
+
+### 1. Teste de Web Scraping
+- **Objetivo**: Realizar o acesso a um site específico e baixar documentos relevantes.
+- **Concluído**:
+  - Acesso ao site designado.
+  - Download dos Anexos I e II em formato PDF.
+  - Compactação de todos os anexos em um único arquivo.
+
+### 2. Teste de Transformação de Dados
+- **Objetivo**: Extrair e estruturar dados de um dos PDFs baixados.
+- **Concluído**:
+  - Extração dos dados da tabela relevante do PDF.
+  - Salvamento dos dados em formato CSV.
+  - Compactação do arquivo CSV em um arquivo ZIP nomeado de forma apropriada.
+  - Substituição de abreviações por descrições completas conforme necessário.
+
+### 3. Teste de Banco de Dados
+- **Objetivo**: Preparar e estruturar dados em um banco de dados.
+- **Concluído**:
+  - Download de arquivos necessários de repositórios públicos.
+  - Criação de scripts SQL para estruturar tabelas.
+  - Elaboração de queries para importar dados, garantindo o encoding correto.
+  - Desenvolvimento de queries analíticas para responder a perguntas específicas sobre despesas de operadoras.
+
+</details>

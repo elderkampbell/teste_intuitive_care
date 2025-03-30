@@ -5,13 +5,11 @@ import logging
 import subprocess
 import threading
 
-# Configuração de logs
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 CORS(app)
 
-# Configuração do banco de dados
 db_config = {
     "host": "localhost",
     "port": 33061,
@@ -20,8 +18,6 @@ db_config = {
     "database": "ans_dados",
 }
 
-
-# Função para conexão com o banco de dados
 def conectar_banco():
     try:
         conn = pymysql.connect(
@@ -38,7 +34,6 @@ def conectar_banco():
         logging.exception("Erro ao conectar com o banco de dados.")
         return None
 
-
 @app.route("/buscar_operadoras", methods=["GET"])
 def buscar_operadoras():
     termo = request.args.get("termo", "").lower()
@@ -52,7 +47,7 @@ def buscar_operadoras():
     try:
         with conn.cursor() as cursor:
             query = """
-                SELECT Registro_ANS, CNPJ, Razao_Social, Nome_Fantasia, UF, Endereco_Eletronico
+                SELECT id, Registro_ANS, CNPJ, Razao_Social, Nome_Fantasia, UF, Endereco_eletronico
                 FROM operadoras
                 WHERE LOWER(Nome_Fantasia) LIKE %s OR LOWER(Razao_Social) LIKE %s
                 LIMIT 50
@@ -67,11 +62,72 @@ def buscar_operadoras():
     finally:
         conn.close()
 
+@app.route("/operadoras", methods=["POST"])
+def adicionar_operadora():
+    dados = request.json
+    conn = conectar_banco()
+    if conn is None:
+        return jsonify({"erro": "Erro ao conectar com o banco de dados."}), 500
+
+    try:
+        with conn.cursor() as cursor:
+            query = """
+                INSERT INTO operadoras (Registro_ANS, CNPJ, Razao_Social, Nome_Fantasia, Modalidade, Logradouro, Numero, Complemento, Bairro, Cidade, UF, CEP, DDD, Telefone, Fax, Endereco_eletronico, Representante, Cargo_Representante, Regiao_de_Comercializacao, Data_Registro_ANS)
+                VALUES (%(Registro_ANS)s, %(CNPJ)s, %(Razao_Social)s, %(Nome_Fantasia)s, %(Modalidade)s, %(Logradouro)s, %(Numero)s, %(Complemento)s, %(Bairro)s, %(Cidade)s, %(UF)s, %(CEP)s, %(DDD)s, %(Telefone)s, %(Fax)s, %(Endereco_eletronico)s, %(Representante)s, %(Cargo_Representante)s, %(Regiao_de_Comercializacao)s, %(Data_Registro_ANS)s)
+            """
+            cursor.execute(query, dados)
+            conn.commit()
+        return jsonify({"mensagem": "Operadora adicionada com sucesso!"}), 201
+    except Exception as e:
+        logging.exception("Erro ao adicionar operadora.")
+        return jsonify({"erro": "Erro ao adicionar operadora."}), 500
+    finally:
+        conn.close()
+
+@app.route("/operadoras/<int:id>", methods=["PUT"])
+def atualizar_operadora(id):
+    dados = request.json
+    if not dados:
+        return jsonify({"erro": "Nenhum dado fornecido para atualização."}), 400
+
+    conn = conectar_banco()
+    if conn is None:
+        return jsonify({"erro": "Erro ao conectar com o banco de dados."}), 500
+
+    try:
+        with conn.cursor() as cursor:
+            # Constrói dinamicamente a cláusula SET com os campos enviados
+            set_clause = ", ".join([f"{chave}=%({chave})s" for chave in dados.keys()])
+            query = f"UPDATE operadoras SET {set_clause} WHERE id=%(id)s"
+            dados["id"] = id
+            cursor.execute(query, dados)
+            conn.commit()
+        return jsonify({"mensagem": "Operadora atualizada com sucesso!"}), 200
+    except Exception as e:
+        logging.exception("Erro ao atualizar operadora.")
+        return jsonify({"erro": "Erro ao atualizar operadora."}), 500
+    finally:
+        conn.close()
+
+@app.route("/operadoras/<int:id>", methods=["DELETE"])
+def deletar_operadora(id):
+    conn = conectar_banco()
+    if conn is None:
+        return jsonify({"erro": "Erro ao conectar com o banco de dados."}), 500
+
+    try:
+        with conn.cursor() as cursor:
+            query = "DELETE FROM operadoras WHERE id=%s"
+            cursor.execute(query, (id,))
+            conn.commit()
+        return jsonify({"mensagem": "Operadora deletada com sucesso!"}), 200
+    except Exception as e:
+        logging.exception("Erro ao deletar operadora.")
+        return jsonify({"erro": "Erro ao deletar operadora."}), 500
+    finally:
+        conn.close()
 
 def preparar_vue():
-    """
-    Função para rodar 'npm install' e iniciar o servidor Vue.js.
-    """
     try:
         logging.info("Instalando dependências do Vue.js com npm install...")
         subprocess.run(["npm", "install"], cwd="./interface_vue_js", check=True)
@@ -82,11 +138,7 @@ def preparar_vue():
     except Exception as e:
         logging.exception("Erro ao preparar o servidor Vue.js.")
 
-
 if __name__ == "__main__":
-    # Iniciar o Vue.js em um thread separado
     vue_thread = threading.Thread(target=preparar_vue)
     vue_thread.start()
-
-    # Iniciar o servidor Flask
     app.run(debug=True)

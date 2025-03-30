@@ -1,0 +1,249 @@
+{
+  "info": {
+    "_postman_id": "d5aef7fd-1234-4c2a-9c12-abcdef123456",
+    "name": "Operadoras API Collection Extended",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Buscar Operadoras",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Response is JSON array\", function () {",
+              "    pm.response.to.be.json;",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:5000/buscar_operadoras?termo=exemplo",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "buscar_operadoras"
+          ],
+          "query": [
+            {
+              "key": "termo",
+              "value": "exemplo"
+            }
+          ]
+        },
+        "description": "Busca operadoras com o termo especificado."
+      },
+      "response": []
+    },
+    {
+      "name": "Adicionar Operadora",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "pm.test(\"Operadora added successfully\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.mensagem).to.eql(\"Operadora adicionada com sucesso!\");",
+              "});",
+              "// Define a variável de ambiente para o campo que a API pesquisa (Razao_Social)",
+              "pm.environment.set(\"uniqueRazaoSocial\", \"Exemplo SA\");",
+              "// Aguarda 2 segundos antes de enviar o GET para verificação",
+              "setTimeout(function() {",
+              "    pm.sendRequest({",
+              "        url: \"http://127.0.0.1:5000/buscar_operadoras?termo=\" + encodeURIComponent(pm.environment.get(\"uniqueRazaoSocial\")),",
+              "        method: \"GET\"",
+              "    }, function (err, res) {",
+              "        pm.test(\"Record exists after POST\", function () {",
+              "            pm.expect(err).to.equal(null);",
+              "            var jsonData = res.json();",
+              "            pm.expect(jsonData.length).to.be.above(0);",
+              "            var found = jsonData.some(function(item) {",
+              "                return item.Razao_Social && item.Razao_Social.toLowerCase().includes(pm.environment.get(\"uniqueRazaoSocial\").toLowerCase());",
+              "            });",
+              "            pm.expect(found).to.be.true;",
+              "        });",
+              "    });",
+              "}, 2000);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"Registro_ANS\": \"1234567890\",\n    \"CNPJ\": \"12.345.678/0001-90\",\n    \"Razao_Social\": \"Exemplo SA\",\n    \"Nome_Fantasia\": \"Exemplo\",\n    \"Modalidade\": \"Tipo\",\n    \"Logradouro\": \"Rua Exemplo\",\n    \"Numero\": \"100\",\n    \"Complemento\": \"Apto 1\",\n    \"Bairro\": \"Centro\",\n    \"Cidade\": \"Cidade Exemplo\",\n    \"UF\": \"PE\",\n    \"CEP\": \"12345-678\",\n    \"DDD\": \"12\",\n    \"Telefone\": \"1234-5678\",\n    \"Fax\": \"1234-5678\",\n    \"Endereco_eletronico\": \"contato@exemplo.com\",\n    \"Representante\": \"Fulano de Tal\",\n    \"Cargo_Representante\": \"Gerente\",\n    \"Regiao_de_Comercializacao\": \"Norte\",\n    \"Data_Registro_ANS\": \"2025-01-01\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/operadoras",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "operadoras"
+          ]
+        },
+        "description": "Adiciona uma nova operadora."
+      },
+      "response": []
+    },
+    {
+      "name": "Atualizar Operadora (PUT)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Operadora updated successfully\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.mensagem).to.eql(\"Operadora atualizada com sucesso!\");",
+              "});",
+              "// Aguarda 2 segundos antes do GET para verificação da atualização",
+              "setTimeout(function() {",
+              "    pm.sendRequest({",
+              "        url: \"http://127.0.0.1:5000/buscar_operadoras?termo=\" + encodeURIComponent(\"Exemplo Atualizado SA\"),",
+              "        method: \"GET\"",
+              "    }, function(err, res) {",
+              "       pm.test(\"Record updated after PUT\", function () {",
+              "          pm.expect(err).to.equal(null);",
+              "          var jsonData = res.json();",
+              "          var found = jsonData.some(function(item) {",
+              "              return item.Razao_Social && item.Razao_Social.toLowerCase().includes(\"exemplo atualizado sa\");",
+              "          });",
+              "          pm.expect(found).to.be.true;",
+              "       });",
+              "    });",
+              "}, 2000);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"CNPJ\": \"98.765.432/0001-00\",\n    \"Razao_Social\": \"Exemplo Atualizado SA\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:5000/operadoras/1",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "operadoras",
+            "1"
+          ]
+        },
+        "description": "Atualiza parcialmente a operadora com ID 1."
+      },
+      "response": []
+    },
+    {
+      "name": "Deletar Operadora",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Operadora deleted successfully\", function () {",
+              "  var jsonData = pm.response.json();",
+              "  pm.expect(jsonData.mensagem).to.eql(\"Operadora deletada com sucesso!\");",
+              "});",
+              "// Aguarda 2 segundos antes de enviar o GET para confirmar a exclusão",
+              "setTimeout(function() {",
+              "    pm.sendRequest({",
+              "        url: \"http://127.0.0.1:5000/buscar_operadoras?termo=\" + encodeURIComponent(\"Exemplo Atualizado SA\"),",
+              "        method: \"GET\"",
+              "    }, function(err, res) {",
+              "        pm.test(\"Record does not exist after DELETE\", function() {",
+              "            pm.expect(err).to.equal(null);",
+              "            var jsonData = res.json();",
+              "            var found = jsonData.some(function(item) {",
+              "                return item.Razao_Social && item.Razao_Social.toLowerCase().includes(\"exemplo atualizado sa\");",
+              "            });",
+              "            pm.expect(found).to.be.false;",
+              "        });",
+              "    });",
+              "}, 2000);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:5000/operadoras/1",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "5000",
+          "path": [
+            "operadoras",
+            "1"
+          ]
+        },
+        "description": "Exclui a operadora com ID 1."
+      },
+      "response": []
+    }
+  ]
+}

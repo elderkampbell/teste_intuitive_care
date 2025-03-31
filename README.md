@@ -20,10 +20,26 @@ Este projeto é uma aplicação para raspagem, extração e processamento de dad
 
 ## Pré-requisitos
 
-- **Python 3**  
-  Recomenda-se o uso de um ambiente virtual para gerenciar as dependências.
+- **Python 3 e pip**  
 - **Node.js e npm**  
 - **Banco de Dados MySQL**
+> **Observação:** Recomenda-se o uso de um ambiente virtual para gerenciar as dependências.
+
+## Clone o repositório
+
+1. **Use o comando git clone seguido da ssh do repositório**
+
+   ```bash
+   git clone git@github.com:elderkampbell/teste_intuitive_care.git
+   ```
+
+2. **Acesse o Diretório do Repositório Clonado**
+
+   Após o clone ser concluído, navegue até o diretório do repositório:
+
+   ```bash
+   cd teste_intuitive_care
+   ```
 
 ## Configuração do Ambiente
 
@@ -58,7 +74,7 @@ Este projeto é uma aplicação para raspagem, extração e processamento de dad
 
 ## Configuração do Banco de Dados
 
-Edite os arquivos `database_setup.py` e `app.py` para configurar o banco de dados, atualizando o objeto `DB_CONFIG` conforme abaixo:
+Edite os arquivos `database_setup.py` e `app.py` para configurar o banco de dados, atualizando o objeto `DB_CONFIG` exemplificado abaixo:
 
 ```python
 DB_CONFIG = {
@@ -70,32 +86,32 @@ DB_CONFIG = {
 }
 ```
 
-Certifique-se de que as configurações correspondem ao ambiente do seu banco.
+> **Atenção:** Certifique-se de que as configurações correspondem ao ambiente do seu banco.
 
 ## Estrutura do Projeto
 
 ```
 projeto/
 ├── src/
-│   ├── app.py                # Inicia o servidor Flask e o frontend Vue.js via a função preparar_vue()
+│   ├── app.py                # Inicia o servidor Flask e o frontend Vue.js via a função preparar_vue().
 │   ├── main.py               # Executa as funcionalidades principais do projeto: raspagem, download, processamento, transformação e compactação dos dados.
-│   ├── parallel.py           # Download paralelo de arquivos
-│   ├── scraping.py           # Funções de raspagem de links e download de PDFs
-│   ├── transform.py          # Transformação e processamento dos dados CSV
-│   ├── utils.py              # Funções auxiliares para manipulação de arquivos, hashes e logs
-│   └── database_setup.py     # Configura as conexões e estrutura do banco de dados
+│   ├── parallel.py           # Download paralelo de arquivos.
+│   ├── scraping.py           # Funções de raspagem de links e download de PDFs.
+│   ├── transform.py          # Transformação e processamento dos dados CSV.
+│   ├── utils.py              # Funções auxiliares para manipulação de arquivos, hashes e logs.
+│   └── database_setup.py     # Configura as conexões e estrutura do banco de dados.
 │   └── database_import.py    # Responsável por gerenciar o download, a extração e a importação dos dados para o banco de dados.
 │
-├── interface_vue_js/         # Diretório do frontend em Vue.js
-│   ├── package.json          # Dependências e scripts do Node.js
+├── interface_vue_js/         # Diretório do frontend em Vue.js.
+│   ├── package.json          # Dependências e scripts do Node.js.
 │   ├── src/
-│   │   └── App.vue           # Componente principal com funcionalidades de pesquisa, adição, edição e deleção
-│   └── ...                   # Outros componentes e arquivos do Vue.js
+│   │   └── App.vue           # Componente principal com funcionalidades de pesquisa, adição, edição e exclusão.
+│   └── ...                   # Outros componentes e arquivos do Vue.js.
 │
-├── Coleção_Postman_Operadoras_API.json  # Arquivo para importação no Postman e execução dos testes da API
-├── requirements.txt          # Dependências Python
-├── tests/                    # Testes automatizados do projeto com pytest
-└── README.md                 # Este arquivo
+├── Coleção_Postman_Operadoras_API.json  # Arquivo para importação no Postman e execução dos testes da API.
+├── requirements.txt          # Dependências Python.
+├── tests/                    # Testes automatizados do projeto com pytest.
+└── README.md                 # Este arquivo.
 ```
 
 ## Execução das Funcionalidades Principais
@@ -120,7 +136,7 @@ O projeto realiza as seguintes etapas:
 10. Consulta das 10 operadoras com maiores despesas nessa categoria no último ano.
 11. Exibição das respostas no terminal.
 
-Essa execução prepara os dados que serão posteriormente gerenciados via API e disponibilizados no frontend.
+> **Obs.** Essa execução prepara os dados que serão posteriormente gerenciados via API e disponibilizados no frontend.
 
 ## Execução dos Servidores
 
@@ -148,7 +164,7 @@ A API permite as seguintes operações:
 
 - **Busca de Operadoras:**  
   Endpoint: `GET /buscar_operadoras?termo=palavra-chave`  
-  Retorna até 50 registros filtrados por *Nome Fantasia* ou *Razão Social* (busca case-insensitive).
+  Retorna até 50 registros filtrados por *Nome Fantasia* ou *Razão Social*.
 
 - **Adicionar Operadora:**  
   Endpoint: `POST /operadoras`  
@@ -169,7 +185,7 @@ A interface web está acessível através de `http://localhost:8080/`
 A interface permite:
 
 - **Pesquisar Operadoras:**  
-  Preencha o campo de busca e clique em "Buscar" para exibir uma lista filtrada.
+  Preencha o campo de busca e clique em "Buscar" para exibir uma lista filtrada por *Nome Fantasia* ou *Razão Social*.
 - **Adicionar Operadora:**  
   Complete o formulário e clique em "Adicionar".
 - **Editar Operadora:**  

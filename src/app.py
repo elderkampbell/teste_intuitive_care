@@ -49,9 +49,30 @@ def buscar_operadoras():
     try:
         with conn.cursor() as cursor:
             query = """
-                SELECT id, Registro_ANS, CNPJ, Razao_Social, Nome_Fantasia, UF, Endereco_eletronico
+                SELECT 
+                  id,
+                  registro_ans AS Registro_ANS,
+                  cnpj AS CNPJ,
+                  razao_social AS Razao_Social,
+                  nome_fantasia AS Nome_Fantasia,
+                  modalidade AS Modalidade,
+                  logradouro AS Logradouro,
+                  numero AS Numero,
+                  complemento AS Complemento,
+                  bairro AS Bairro,
+                  cidade AS Cidade,
+                  uf AS UF,
+                  cep AS CEP,
+                  ddd AS DDD,
+                  telefone AS Telefone,
+                  fax AS Fax,
+                  endereco_eletronico AS Endereco_eletronico,
+                  representante AS Representante,
+                  cargo_representante AS Cargo_Representante,
+                  regiao_de_comercializacao AS Regiao_de_Comercializacao,
+                  data_registro_ans AS Data_Registro_ANS
                 FROM operadoras
-                WHERE LOWER(Nome_Fantasia) LIKE %s OR LOWER(Razao_Social) LIKE %s
+                WHERE LOWER(nome_fantasia) LIKE %s OR LOWER(razao_social) LIKE %s
                 LIMIT 50
             """
             termo_busca = f"%{termo}%"
@@ -75,7 +96,7 @@ def adicionar_operadora():
     try:
         with conn.cursor() as cursor:
             query = """
-                INSERT INTO operadoras (Registro_ANS, CNPJ, Razao_Social, Nome_Fantasia, Modalidade, Logradouro, Numero, Complemento, Bairro, Cidade, UF, CEP, DDD, Telefone, Fax, Endereco_eletronico, Representante, Cargo_Representante, Regiao_de_Comercializacao, Data_Registro_ANS)
+                INSERT INTO operadoras (registro_ans, cnpj, razao_social, nome_fantasia, modalidade, logradouro, numero, complemento, bairro, cidade, uf, cep, ddd, telefone, fax, endereco_eletronico, representante, cargo_representante, regiao_de_comercializacao, data_registro_ans)
                 VALUES (%(Registro_ANS)s, %(CNPJ)s, %(Razao_Social)s, %(Nome_Fantasia)s, %(Modalidade)s, %(Logradouro)s, %(Numero)s, %(Complemento)s, %(Bairro)s, %(Cidade)s, %(UF)s, %(CEP)s, %(DDD)s, %(Telefone)s, %(Fax)s, %(Endereco_eletronico)s, %(Representante)s, %(Cargo_Representante)s, %(Regiao_de_Comercializacao)s, %(Data_Registro_ANS)s)
             """
             cursor.execute(query, dados)
@@ -100,8 +121,7 @@ def atualizar_operadora(id):
 
     try:
         with conn.cursor() as cursor:
-            # Constrói dinamicamente a cláusula SET com os campos enviados
-            set_clause = ", ".join([f"{chave}=%({chave})s" for chave in dados.keys()])
+            set_clause = ", ".join([f"{chave.lower()}=%({chave})s" for chave in dados.keys()])
             query = f"UPDATE operadoras SET {set_clause} WHERE id=%(id)s"
             dados["id"] = id
             cursor.execute(query, dados)

@@ -180,7 +180,6 @@
           v-model="novaOperadora.Data_Registro_ANS"
           type="date"
           placeholder="Data Registro ANS"
-          required
         />
       </div>
       <button type="submit">{{ editando ? "Atualizar" : "Adicionar" }}</button>

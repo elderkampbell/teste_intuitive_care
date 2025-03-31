@@ -2,76 +2,58 @@ import os
 import logging
 import csv
 
-# Configuração de logs
+# Configura o logging com nível INFO e formato com data, nível e mensagem.
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-# Diretório de saída para os arquivos transformados
+# Diretório onde os arquivos transformados serão salvos.
 PASTA_SAIDA = "saida"
 
-# Dicionário para substituição das abreviações
+# Mapeamento de abreviações para suas formas completas.
 SUBSTITUICOES = {
     "OD": "Seg. Odontológica",
     "AMB": "Seg. Ambulatorial",
 }
 
-
 def criar_pasta_saida():
-    """Cria a pasta de saída para os arquivos processados."""
+    # Cria a pasta de saída se ela não existir.
     os.makedirs(PASTA_SAIDA, exist_ok=True)
     logging.info(f"Pasta de saída verificada/criada: {PASTA_SAIDA}")
 
-
 def transformar_dados(csv_path):
-    """Substitui abreviações no CSV e gera um novo arquivo transformado sem repetição de cabeçalhos.
-
-    Parâmetros:
-    csv_path (str): Caminho do arquivo CSV a ser transformado.
-
-    Retorna:
-    str: Caminho do arquivo CSV transformado.
-    """
-    # Define o caminho do arquivo CSV transformado
+    # Define o caminho para o arquivo CSV transformado.
     csv_transformado = os.path.join(PASTA_SAIDA, "dados_transformados.csv")
 
-    # Abre o arquivo CSV de entrada para leitura e o arquivo de saída para escrita
+    # Abre o CSV original para leitura e o transformado para escrita.
     with open(csv_path, "r", encoding="utf-8") as f_in, open(
         csv_transformado, "w", newline="", encoding="utf-8"
     ) as f_out:
         reader = csv.reader(f_in)
         writer = csv.writer(f_out)
 
-        # Lê o primeiro cabeçalho e escreve no arquivo de saída
+        # Lê e escreve o cabeçalho apenas uma vez.
         primeiro_cabecalho = next(reader)
-        writer.writerow(primeiro_cabecalho)  # Escreve o cabeçalho apenas uma vez
+        writer.writerow(primeiro_cabecalho)
 
-        # Processa cada linha do CSV
+        # Processa cada linha, ignorando cabeçalhos duplicados.
         for row in reader:
-            if row != primeiro_cabecalho:  # Ignora repetições de cabeçalho
-                # Verifica se há pelo menos 7 colunas
+            if row != primeiro_cabecalho:
+                # Se houver pelo menos 7 colunas, realiza substituições nos índices 3 e 4.
                 if len(row) > 6:
-                    # Substitui abreviações nas colunas corretas (índices 3 e 4)
-                    row[3] = SUBSTITUICOES.get(
-                        row[3], row[3]
-                    )  # Substitui 'Seg. Odontológica'
-                    row[4] = SUBSTITUICOES.get(
-                        row[4], row[4]
-                    )  # Substitui 'Seg. Ambulatorial'
-                writer.writerow(row)  # Escreve a linha transformada no arquivo de saída
+                    row[3] = SUBSTITUICOES.get(row[3], row[3])
+                    row[4] = SUBSTITUICOES.get(row[4], row[4])
+                writer.writerow(row)
 
     logging.info(f"Transformação concluída. Dados salvos em: {csv_transformado}")
     return csv_transformado
 
-
 if __name__ == "__main__":
-    # Define o caminho do arquivo CSV extraído
+    # Define o caminho do CSV extraído para processamento.
     csv_extraido = os.path.join(PASTA_SAIDA, "dados_extraidos.csv")
 
-    # Verifica se o arquivo de extração existe antes de tentar transformá-lo
+    # Se o arquivo extraído existir, executa a transformação; caso contrário, registra um erro.
     if os.path.exists(csv_extraido):
-        transformar_dados(csv_extraido)  # Chama a função para transformar os dados
+        transformar_dados(csv_extraido)
     else:
-        logging.error(
-            "Arquivo de extração não encontrado. Execute a extração primeiro."
-        )
+        logging.error("Arquivo de extração não encontrado. Execute a extração primeiro.")

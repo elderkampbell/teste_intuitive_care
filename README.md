@@ -97,10 +97,12 @@ projeto/
 │   ├── main.py               # Executa as funcionalidades principais do projeto: raspagem, download, processamento, transformação e compactação dos dados.
 │   ├── parallel.py           # Download paralelo de arquivos.
 │   ├── scraping.py           # Funções de raspagem de links e download de PDFs.
+│   ├── extraction.py         # Extrai dados dos PDFs e gera arquivos CSV.
 │   ├── transform.py          # Transformação e processamento dos dados CSV.
 │   ├── utils.py              # Funções auxiliares para manipulação de arquivos, hashes e logs.
-│   └── database_setup.py     # Configura as conexões e estrutura do banco de dados.
-│   └── database_import.py    # Responsável por gerenciar o download, a extração e a importação dos dados para o banco de dados.
+│   ├── database_setup.py     # Configura as conexões e estrutura do banco de dados.
+│   ├── database_import.py    # Responsável por gerenciar o download, a extração e a importação dos dados para o banco de dados.
+│   └── data_analysis.py      # Executa análises e consultas sobre os dados armazenados no banco.
 │
 ├── interface_vue_js/         # Diretório do frontend em Vue.js.
 │   ├── package.json          # Dependências e scripts do Node.js.

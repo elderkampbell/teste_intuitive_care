@@ -12,30 +12,29 @@ DB_CONFIG = {
     "database": "ans_dados",
 }
 
-# URL dos dados de operadoras
+# URL dos dados de operadoras (arquivo CSV)
 URL_OPERADORAS = "https://dadosabertos.ans.gov.br/FTP/PDA/operadoras_de_plano_de_saude_ativas/Relatorio_cadop.csv"
 
-# Diretório de download
+# Diretório para armazenar o CSV baixado; cria o diretório se não existir
 DOWNLOAD_DIR = "downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
-
 def conectar_bd():
-    """Conecta ao banco de dados e retorna a conexão."""
+    # Tenta conectar ao banco de dados usando as configurações definidas.
     try:
         return mysql.connector.connect(**DB_CONFIG)
     except mysql.connector.Error as err:
         print(f"Erro ao conectar ao banco de dados: {err}")
         return None
 
-
 def criar_tabelas():
-    """Cria as tabelas necessárias no banco de dados."""
+    # Cria as tabelas necessárias no banco: 'operadoras' e 'demonstracoes_contabeis'
     conn = conectar_bd()
     if not conn:
         return
 
     cursor = conn.cursor()
+
     queries = [
         """
         CREATE TABLE IF NOT EXISTS operadoras (
@@ -64,17 +63,18 @@ def criar_tabelas():
         """,
         """
         CREATE TABLE IF NOT EXISTS demonstracoes_contabeis (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                data DATE,
-                reg_ans VARCHAR(30),
-                cd_conta_contabil VARCHAR(20),
-                descricao VARCHAR(255),
-                vl_saldo_inicial VARCHAR(30),
-                vl_saldo_final VARCHAR(30)
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            data DATE,
+            reg_ans VARCHAR(30),
+            cd_conta_contabil VARCHAR(20),
+            descricao VARCHAR(255),
+            vl_saldo_inicial VARCHAR(30),
+            vl_saldo_final VARCHAR(30)
         );
         """,
     ]
 
+    # Executa cada query para criar as tabelas, se elas ainda não existirem
     for query in queries:
         cursor.execute(query)
 
@@ -83,9 +83,8 @@ def criar_tabelas():
     conn.close()
     print("Tabelas criadas com sucesso!")
 
-
 def importar_operadoras():
-    """Baixa e importa os dados das operadoras ativas."""
+    # Baixa o arquivo CSV de operadoras e importa os dados para a tabela 'operadoras'
     csv_path = os.path.join(DOWNLOAD_DIR, "Relatorio_cadop.csv")
 
     print("Baixando dados das operadoras...")
@@ -98,6 +97,7 @@ def importar_operadoras():
         print("Erro ao baixar os dados das operadoras.")
         return
 
+    # Lê os dados do CSV usando o pandas
     df = pd.read_csv(csv_path, sep=";", encoding="utf-8")
     conn = conectar_bd()
     if not conn:
@@ -105,6 +105,7 @@ def importar_operadoras():
 
     cursor = conn.cursor()
 
+    # Insere cada linha do DataFrame na tabela 'operadoras'
     for _, row in df.iterrows():
         cursor.execute(
             """
@@ -128,11 +129,10 @@ def importar_operadoras():
     conn.close()
     print("Dados das operadoras importados com sucesso!")
 
-
 def main():
+    # Executa o fluxo: cria as tabelas e importa os dados das operadoras.
     criar_tabelas()
     importar_operadoras()
-
 
 if __name__ == "__main__":
     main()

@@ -3,34 +3,27 @@ import logging
 import csv
 import pdfplumber  # type: ignore
 
-# Configuração de logs
+# Configura o logging com nível INFO e formatação padrão com data, nível e mensagem.
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-# Reduz a verbosidade do pdfminer
+# Reduz a verbosidade das mensagens do pdfminer para evitar logs excessivos.
 logging.getLogger("pdfminer").setLevel(logging.WARNING)
 
-# Diretórios para armazenar os arquivos
+# Diretórios usados para armazenar os arquivos de entrada e saída.
 PASTA_ANEXOS = "anexos"
 PASTA_SAIDA = "saida"
 
 
 def criar_pasta_saida():
-    """Cria a pasta de saída para os arquivos processados."""
+    # Garante que a pasta de saída exista, criando-a se necessário.
     os.makedirs(PASTA_SAIDA, exist_ok=True)
     logging.info(f"Pasta de saída verificada/criada: {PASTA_SAIDA}")
 
 
 def validar_pdf(pdf_path):
-    """Verifica se o PDF é válido antes de processar.
-
-    Args:
-        pdf_path (str): Caminho para o arquivo PDF a ser validado.
-
-    Returns:
-        bool: True se o PDF é válido e contém páginas, False caso contrário.
-    """
+    # Verifica se o PDF é válido, retornando True se possui páginas.
     try:
         with pdfplumber.open(pdf_path) as pdf:
             return len(pdf.pages) > 0
@@ -40,12 +33,7 @@ def validar_pdf(pdf_path):
 
 
 def processar_pdf(pdf_path, writer):
-    """Extrai tabelas do PDF e escreve no CSV.
-
-    Args:
-        pdf_path (str): Caminho para o arquivo PDF a ser processado.
-        writer (csv.writer): Objeto writer para escrever no arquivo CSV.
-    """
+    # Abre o PDF e extrai tabelas de cada página, escrevendo os dados extraídos no CSV.
     logging.info(f"Processando arquivo PDF: {pdf_path}")
     try:
         with pdfplumber.open(pdf_path) as pdf:
@@ -57,7 +45,7 @@ def processar_pdf(pdf_path, writer):
                 for table in tables:
                     for row in table:
                         if row:
-                            # Preenchendo colunas ausentes com strings vazias
+                            # Garante que cada linha tenha pelo menos 10 colunas, preenchendo com strings vazias.
                             while len(row) < 10:
                                 row.append("")
                             writer.writerow(row)
@@ -66,20 +54,15 @@ def processar_pdf(pdf_path, writer):
 
 
 def extrair_dados(pdf_path):
-    """Executa o processo de extração de tabelas do PDF e salva em CSV.
+    # Executa o fluxo completo de extração de tabelas do PDF para um arquivo CSV.
 
-    Args:
-        pdf_path (str): Caminho para o arquivo PDF a ser processado.
-
-    Returns:
-        str: Caminho do arquivo CSV gerado, ou None se a extração falhar.
-    """
-    criar_pasta_saida()  # Cria a pasta de saída se não existir
+    # Cria o diretório de saída, se necessário.
+    criar_pasta_saida()
     csv_path = os.path.join(PASTA_SAIDA, "dados_extraidos.csv")
 
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        # Escreve o cabeçalho do CSV
+        # Define e escreve o cabeçalho do CSV.
         writer.writerow(
             [
                 "Procedimento",
@@ -98,12 +81,12 @@ def extrair_dados(pdf_path):
             ]
         )
 
-        # Valida o PDF antes de processar
+        # Verifica se o PDF é válido antes de prosseguir.
         if not validar_pdf(pdf_path):
             logging.error("O PDF fornecido é inválido ou corrompido.")
             return None
 
-        # Processa o PDF e escreve os dados no CSV
+        # Processa o PDF e escreve as informações extraídas no CSV.
         processar_pdf(pdf_path, writer)
 
     logging.info(f"Extração concluída. Dados salvos em: {csv_path}")
@@ -111,6 +94,6 @@ def extrair_dados(pdf_path):
 
 
 if __name__ == "__main__":
-    # Define o caminho do PDF a ser processado
+    # Define o caminho do PDF de exemplo e inicia o processo de extração.
     pdf_path = os.path.join(PASTA_ANEXOS, "Anexo_I_Rol_2021RN_465.2021_RN627L.2024.pdf")
-    extrair_dados(pdf_path)  # Inicia o processo de extração
+    extrair_dados(pdf_path)

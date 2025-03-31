@@ -1,91 +1,75 @@
 <template>
+  <!-- Layout principal do componente para buscar, adicionar/editar e listar operadoras -->
   <div class="hello">
     <h1>Buscar Operadoras</h1>
     <div class="search-container">
+      <!-- Campo de busca vinculado à variável 'termo' -->
       <input v-model="termo" placeholder="Digite o termo de busca" />
       <button @click="buscar">Buscar</button>
     </div>
 
+    <!-- Formulário para adicionar ou editar uma operadora -->
     <form @submit.prevent="adicionarOperadora">
       <h2 v-if="!editando">Adicionar Operadora</h2>
       <h2 v-else>Editar Operadora</h2>
       <div class="form-grid">
-        <!-- Registro ANS: varchar(10) -->
+        <!-- Cada input representa um atributo da nova operadora -->
         <input
           v-model="novaOperadora.Registro_ANS"
           placeholder="Registro ANS (máx. 10 caracteres)"
           required
           maxlength="10"
         />
-
-        <!-- CNPJ: varchar(18) -->
         <input
           v-model="novaOperadora.CNPJ"
           placeholder="CNPJ (máx. 18 caracteres)"
           required
           maxlength="18"
         />
-
-        <!-- Razão Social: varchar(255) -->
         <input
           v-model="novaOperadora.Razao_Social"
           placeholder="Razão Social"
           required
           maxlength="255"
         />
-
-        <!-- Nome Fantasia: varchar(255) -->
         <input
           v-model="novaOperadora.Nome_Fantasia"
           placeholder="Nome Fantasia"
           maxlength="255"
         />
-
-        <!-- Modalidade: varchar(50) -->
         <input
           v-model="novaOperadora.Modalidade"
           placeholder="Modalidade"
           required
           maxlength="50"
         />
-
-        <!-- Logradouro: varchar(255) -->
         <input
           v-model="novaOperadora.Logradouro"
           placeholder="Logradouro"
           maxlength="255"
         />
-
-        <!-- Número: varchar(15) -->
         <input
           v-model="novaOperadora.Numero"
           placeholder="Número"
           maxlength="15"
         />
-
-        <!-- Complemento: varchar(255) -->
         <input
           v-model="novaOperadora.Complemento"
           placeholder="Complemento"
           maxlength="255"
         />
-
-        <!-- Bairro: varchar(255) -->
         <input
           v-model="novaOperadora.Bairro"
           placeholder="Bairro"
           maxlength="255"
         />
-
-        <!-- Cidade: varchar(255) -->
         <input
           v-model="novaOperadora.Cidade"
           placeholder="Cidade"
           required
           maxlength="255"
         />
-
-        <!-- UF: varchar(2); Usando select para reduzir erros -->
+        <!-- Campo select para UF com opções pré-definidas -->
         <select v-model="novaOperadora.UF" required>
           <option disabled value="">Selecione o UF</option>
           <option value="AC">AC</option>
@@ -116,36 +100,26 @@
           <option value="SE">SE</option>
           <option value="TO">TO</option>
         </select>
-
-        <!-- CEP: varchar(15) -->
         <input
           v-model="novaOperadora.CEP"
           placeholder="CEP (máx. 15 caracteres)"
           maxlength="15"
         />
-
-        <!-- DDD: varchar(5) -->
         <input
           v-model="novaOperadora.DDD"
           placeholder="DDD (máx. 5 caracteres)"
           maxlength="5"
         />
-
-        <!-- Telefone: varchar(15) -->
         <input
           v-model="novaOperadora.Telefone"
           placeholder="Telefone (máx. 15 caracteres)"
           maxlength="15"
         />
-
-        <!-- Fax: varchar(30) -->
         <input
           v-model="novaOperadora.Fax"
           placeholder="Fax (máx. 30 caracteres)"
           maxlength="30"
         />
-
-        <!-- Endereço Eletrônico: varchar(255); usando type=email -->
         <input
           v-model="novaOperadora.Endereco_eletronico"
           placeholder="E-mail"
@@ -153,29 +127,21 @@
           type="email"
           maxlength="255"
         />
-
-        <!-- Representante: varchar(255) -->
         <input
           v-model="novaOperadora.Representante"
           placeholder="Representante"
           maxlength="255"
         />
-
-        <!-- Cargo do Representante: varchar(255) -->
         <input
           v-model="novaOperadora.Cargo_Representante"
           placeholder="Cargo do Representante"
           maxlength="255"
         />
-
-        <!-- Região de Comercialização: varchar(255) -->
         <input
           v-model="novaOperadora.Regiao_de_Comercializacao"
           placeholder="Região de Comercialização"
           maxlength="255"
         />
-
-        <!-- Data Registro ANS: date -->
         <input
           v-model="novaOperadora.Data_Registro_ANS"
           type="date"
@@ -185,6 +151,7 @@
       <button type="submit">{{ editando ? "Atualizar" : "Adicionar" }}</button>
     </form>
 
+    <!-- Tabela exibindo as operadoras cadastradas -->
     <table v-if="operadoras.length">
       <thead>
         <tr>
@@ -219,9 +186,9 @@
 export default {
   data() {
     return {
-      termo: "",
-      operadoras: [],
-      novaOperadora: {
+      termo: "",            // Termo de busca inserido pelo usuário
+      operadoras: [],       // Lista de operadoras obtidas do backend
+      novaOperadora: {      // Dados para criar ou atualizar uma operadora
         Registro_ANS: "",
         CNPJ: "",
         Razao_Social: "",
@@ -243,11 +210,12 @@ export default {
         Regiao_de_Comercializacao: "",
         Data_Registro_ANS: "",
       },
-      editando: false,
-      operadoraEditando: null
+      editando: false,         // Flag que indica se estamos editando uma operadora
+      operadoraEditando: null  // Armazena a operadora em processo de edição
     };
   },
   methods: {
+    // Busca operadoras no backend com base no termo de busca
     async buscar() {
       try {
         const response = await fetch(`http://127.0.0.1:5000/buscar_operadoras?termo=${this.termo}`);
@@ -260,10 +228,11 @@ export default {
         console.error("Erro de conexão:", error);
       }
     },
+    // Adiciona uma nova operadora ou atualiza uma existente, conforme o modo de edição
     async adicionarOperadora() {
       try {
         if (this.editando) {
-          // Cria objeto apenas com os campos modificados
+          // Prepara os dados que foram efetivamente alterados
           const dadosAtualizados = {};
           for (const chave in this.novaOperadora) {
             if (this.novaOperadora[chave] && this.novaOperadora[chave] !== this.operadoraEditando[chave]) {
@@ -299,11 +268,13 @@ export default {
         console.error("Erro ao adicionar/editar operadora:", error);
       }
     },
+    // Prepara o formulário de edição preenchendo com os dados da operadora selecionada
     prepararEdicao(operadora) {
       this.novaOperadora = { ...operadora };
       this.operadoraEditando = { ...operadora };
       this.editando = true;
     },
+    // Deleta a operadora com base no seu ID
     async deletarOperadora(id) {
       try {
         const response = await fetch(`http://127.0.0.1:5000/operadoras/${id}`, {
@@ -316,6 +287,7 @@ export default {
         console.error("Erro ao deletar operadora:", error);
       }
     },
+    // Reseta o formulário para seu estado inicial
     resetFormulario() {
       this.novaOperadora = {
         Registro_ANS: "",
@@ -343,6 +315,7 @@ export default {
     }
   },
   mounted() {
+    // Busca as operadoras assim que o componente é montado
     this.buscar();
   }
 };

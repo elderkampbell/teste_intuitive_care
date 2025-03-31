@@ -5,21 +5,20 @@ import pandas as pd  # type: ignore
 import logging
 from .database_setup import conectar_bd
 
-# Diretórios para armazenamento
+# Diretórios onde os arquivos baixados e extraídos serão armazenados.
 DIRETORIO_ANEXOS = "downloads"
 DIRETORIO_EXTRAIDOS = "relatorios"
 os.makedirs(DIRETORIO_ANEXOS, exist_ok=True)
 os.makedirs(DIRETORIO_EXTRAIDOS, exist_ok=True)
 
-# Configuração dos anos e trimestres
+# Configura os anos e trimestres que serão utilizados para formar as URLs e baixar os arquivos.
 ANOS = ["2023", "2024"]
 TRIMESTRES = ["1T", "2T", "3T", "4T"]
 URL_BASE = "https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/"
 URL_OPERADORAS = "https://dadosabertos.ans.gov.br/FTP/PDA/operadoras_de_plano_de_saude_ativas/Relatorio_cadop.csv"
 
-
 def baixar_arquivos():
-    """Baixa os arquivos ZIP das demonstrações contábeis."""
+    # Faz o download dos arquivos ZIP das demonstrações contábeis para cada ano e trimestre configurado.
     for ano in ANOS:
         for trimestre in TRIMESTRES:
             zip_url = f"{URL_BASE}{ano}/{trimestre}{ano}.zip"
@@ -38,9 +37,8 @@ def baixar_arquivos():
             else:
                 logging.error(f"Erro ao baixar {zip_url}")
 
-
 def extrair_zip():
-    """Extrai todos os arquivos ZIP baixados."""
+    # Extrai todos os arquivos ZIP presentes no diretório de downloads para o diretório de extraídos.
     for arquivo in os.listdir(DIRETORIO_ANEXOS):
         if arquivo.endswith(".zip"):
             zip_path = os.path.join(DIRETORIO_ANEXOS, arquivo)
@@ -48,14 +46,11 @@ def extrair_zip():
                 zip_ref.extractall(DIRETORIO_EXTRAIDOS)
             logging.info(f"Extraído: {zip_path}")
 
-
 def corrigir_dados(df):
-    """Corrige os formatos de data e valores numéricos."""
+    # Corrige o formato de data e converte valores numéricos em formato string para float.
     if "DATA" in df.columns:
         try:
-            df["DATA"] = pd.to_datetime(df["DATA"], dayfirst=True).dt.strftime(
-                "%Y-%m-%d"
-            )
+            df["DATA"] = pd.to_datetime(df["DATA"], dayfirst=True).dt.strftime("%Y-%m-%d")
         except Exception as e:
             logging.error(f"Erro ao converter datas: {e}")
 
@@ -65,9 +60,8 @@ def corrigir_dados(df):
 
     return df
 
-
 def importar_demonstracoes():
-    """Importa os dados das demonstrações contábeis para o banco de dados."""
+    # Importa os dados das demonstrações contábeis para o banco de dados.
     arquivos_csv = [f for f in os.listdir(DIRETORIO_EXTRAIDOS) if f.endswith(".csv")]
     conexao = conectar_bd()
     if not conexao:
@@ -87,18 +81,10 @@ def importar_demonstracoes():
             logging.error(f"Erro ao carregar arquivo {arquivo}: {e}")
             continue
 
-        colunas_esperadas = {
-            "DATA",
-            "REG_ANS",
-            "CD_CONTA_CONTABIL",
-            "DESCRICAO",
-            "VL_SALDO_INICIAL",
-            "VL_SALDO_FINAL",
-        }
+        # Define as colunas esperadas para validar o arquivo.
+        colunas_esperadas = {"DATA", "REG_ANS", "CD_CONTA_CONTABIL", "DESCRICAO", "VL_SALDO_INICIAL", "VL_SALDO_FINAL"}
         if not colunas_esperadas.issubset(df.columns):
-            logging.error(
-                f"Colunas inesperadas no arquivo {arquivo}. Pulando importação."
-            )
+            logging.error(f"Colunas inesperadas no arquivo {arquivo}. Pulando importação.")
             continue
 
         for _, row in df.iterrows():
@@ -106,13 +92,13 @@ def importar_demonstracoes():
                 cursor.execute(
                     """
                     INSERT INTO demonstracoes_contabeis (
-                                                            data, 
-                                                            reg_ans, 
-                                                            cd_conta_contabil, 
-                                                            descricao, 
-                                                            vl_saldo_inicial, 
-                                                            vl_saldo_final
-                                                        )
+                        data, 
+                        reg_ans, 
+                        cd_conta_contabil, 
+                        descricao, 
+                        vl_saldo_inicial, 
+                        vl_saldo_final
+                    )
                     VALUES (%s, %s, %s, %s, %s, %s)
                     """,
                     (
@@ -133,11 +119,9 @@ def importar_demonstracoes():
     cursor.close()
     conexao.close()
 
-
 def importar_operadoras():
-    """Baixa e importa os dados das operadoras ativas."""
+    # Baixa o CSV com os dados das operadoras ativas e importa para o banco de dados.
     csv_path = os.path.join(DIRETORIO_ANEXOS, "Relatorio_cadop.csv")
-
     logging.info("Baixando dados das operadoras...")
     response = requests.get(URL_OPERADORAS)
     if response.status_code == 200:
@@ -156,32 +140,31 @@ def importar_operadoras():
     cursor = conexao.cursor()
 
     for _, row in df.iterrows():
-
         try:
             cursor.execute(
                 """
                 INSERT INTO operadoras (
-                                            registro_ans,
-                                            cnpj, 
-                                            razao_social, 
-                                            nome_fantasia, 
-                                            modalidade, 
-                                            logradouro, 
-                                            numero, 
-                                            complemento, 
-                                            bairro, 
-                                            cidade, 
-                                            uf, 
-                                            cep, 
-                                            ddd, 
-                                            telefone, 
-                                            fax, 
-                                            endereco_eletronico, 
-                                            representante, 
-                                            cargo_representante, 
-                                            regiao_de_comercializacao, 
-                                            data_registro_ans
-                                        )
+                    registro_ans,
+                    cnpj, 
+                    razao_social, 
+                    nome_fantasia, 
+                    modalidade, 
+                    logradouro, 
+                    numero, 
+                    complemento, 
+                    bairro, 
+                    cidade, 
+                    uf, 
+                    cep, 
+                    ddd, 
+                    telefone, 
+                    fax, 
+                    endereco_eletronico, 
+                    representante, 
+                    cargo_representante, 
+                    regiao_de_comercializacao, 
+                    data_registro_ans
+                )
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 tuple(
@@ -217,14 +200,16 @@ def importar_operadoras():
     conexao.close()
     logging.info("Dados das operadoras importados com sucesso!")
 
-
 def importar_dados():
-    """Executa a importação completa dos dados."""
+    # Executa o fluxo completo de importação:
+    # 1. Baixa os arquivos ZIP das demonstrações contábeis.
+    # 2. Extrai os arquivos ZIP.
+    # 3. Importa os dados das demonstrações contábeis.
+    # 4. Baixa e importa os dados das operadoras.
     baixar_arquivos()
     extrair_zip()
     importar_demonstracoes()
     importar_operadoras()
-
 
 if __name__ == "__main__":
     importar_dados()

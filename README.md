@@ -58,7 +58,7 @@ Este projeto é uma aplicação para raspagem, extração e processamento de dad
 
 ## Configuração do Banco de Dados
 
-Edite o arquivo `database_setup.py` para configurar o banco de dados, atualizando o objeto `DB_CONFIG` conforme abaixo:
+Edite o arquivo `database_setup.py` e `app.py` para configurar o banco de dados, atualizando o objeto `DB_CONFIG` conforme abaixo:
 
 ```python
 DB_CONFIG = {

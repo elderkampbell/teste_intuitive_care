@@ -58,7 +58,7 @@ Este projeto é uma aplicação para raspagem, extração e processamento de dad
 
 ## Configuração do Banco de Dados
 
-Edite o arquivo `database_setup.py` e `app.py` para configurar o banco de dados, atualizando o objeto `DB_CONFIG` conforme abaixo:
+Edite os arquivos `database_setup.py` e `app.py` para configurar o banco de dados, atualizando o objeto `DB_CONFIG` conforme abaixo:
 
 ```python
 DB_CONFIG = {
@@ -181,7 +181,7 @@ A interface permite:
 
 > **Atenção:** Certifique-se de que a API esteja rodando em `127.0.0.1:5000` antes de iniciar os testes.
 
-Na raiz do projeto, encontra-se o arquivo `Coleção_Postman_Operadoras_API.json`.
+Na raiz do projeto, há o arquivo `Coleção_Postman_Operadoras_API.json`.
 
 ### Instruções de utilização:
 

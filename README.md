@@ -1,4 +1,3 @@
-
 # Projeto de Extração e Processamento de Dados
 
 Este projeto é uma aplicação para raspagem, extração e processamento de dados de arquivos PDF, além de realizar transformações e compactações nos arquivos gerados. O sistema integra uma API (desenvolvida com Flask) e um frontend (desenvolvido com Vue.js) para gerenciamento dos dados de operadoras extraídos e processados no banco de dados.
@@ -29,7 +28,6 @@ Este projeto é uma aplicação para raspagem, extração e processamento de dad
 ## Configuração do Ambiente
 
 1. **Crie o ambiente virtual:**
-
    ```bash
    python3 -m venv .venv
    ```
@@ -49,13 +47,11 @@ Este projeto é uma aplicação para raspagem, extração e processamento de dad
      ```
 
 3. **Instale as dependências:**
-
    ```bash
    pip install -r requirements.txt
    ```
 
 > **Observação:** Para sair do ambiente virtual, utilize:
-> 
 > ```bash
 > source deactivate
 > ```
@@ -88,16 +84,43 @@ projeto/
 │   ├── transform.py          # Transformação e processamento dos dados CSV
 │   ├── utils.py              # Funções auxiliares para manipulação de arquivos, hashes e logs
 │   └── database_setup.py     # Configura as conexões e estrutura do banco de dados
+│   └── database_import.py    # Responsável por gerenciar o download, a extração e a importação dos dados para o banco de dados.
+│
 ├── interface_vue_js/         # Diretório do frontend em Vue.js
 │   ├── package.json          # Dependências e scripts do Node.js
 │   ├── src/
 │   │   └── App.vue           # Componente principal com funcionalidades de pesquisa, adição, edição e deleção
 │   └── ...                   # Outros componentes e arquivos do Vue.js
+│
 ├── Coleção_Postman_Operadoras_API.json  # Arquivo para importação no Postman e execução dos testes da API
 ├── requirements.txt          # Dependências Python
 ├── tests/                    # Testes automatizados do projeto com pytest
 └── README.md                 # Este arquivo
 ```
+
+## Execução das Funcionalidades Principais
+
+O arquivo `src/main.py` é responsável por executar o fluxo completo de processamento dos dados. Ao executar:
+
+```bash
+python3 -m src.main
+```
+
+O projeto realiza as seguintes etapas:
+
+1. Raspagem dos links dos arquivos PDF do repositório público: [https://bit.ly/42fbBAw](https://bit.ly/42fbBAw).
+2. Raspagem, download e extração dos dados dos últimos 2 anos do repositório público: [http://bit.ly/42p4s1I](http://bit.ly/42p4s1I).
+3. Raspagem, download e importação do CSV do repositório: [https://bit.ly/3Rr44td](https://bit.ly/3Rr44td).
+4. Download e armazenamento dos PDFs na pasta `\anexos`.
+5. Extração, transformação e conversão dos dados para o formato CSV, armazenando na pasta `\saida`.
+6. Compactação dos dados transformados em `Teste_elder_kampbell.zip`, armazenando na pasta `\anexos`.
+7. Leitura e importação individual dos dados dos últimos 2 anos baixados para o banco de dados (DB).
+8. Compactação dos arquivos gerados na pasta `\teste_intuitive_care`, nomeando o arquivo como `anexos_DDMMYYYY_HHMMSS`.
+9. Consulta das 10 operadoras com maiores despesas em "EVENTOS/SINISTROS CONHECIDOS OU AVISADOS DE ASSISTÊNCIA À SAÚDE MÉDICO HOSPITALAR" no último trimestre.
+10. Consulta das 10 operadoras com maiores despesas nessa categoria no último ano.
+11. Exibição das respostas no terminal.
+
+Essa execução prepara os dados que serão posteriormente gerenciados via API e disponibilizados no frontend.
 
 ## Execução dos Servidores
 
@@ -115,21 +138,14 @@ A partir daí:
 - O backend Flask roda em [http://127.0.0.1:5000](http://127.0.0.1:5000).
 - O frontend Vue.js normalmente é servido em [http://localhost:8080](http://localhost:8080).
 
-## Execução das Funcionalidades Principais
-
-O arquivo `src/main.py` é responsável por executar o fluxo completo de processamento dos dados. Ao rodá-lo, o projeto realiza:
-- A raspagem dos links dos arquivos PDF.
-- O download e armazenamento dos PDFs.
-- A extração, transformação e conversão dos dados para o formato CSV.
-- A compactação dos arquivos gerados.
-
-Essa execução prepara os dados que serão posteriormente gerenciados via API e disponibilizados no frontend.
-
 ## Uso
 
 ### API (Flask)
 
+A API está acessível através de `http://127.0.0.1:5000/buscar_operadoras?termo=`
+
 A API permite as seguintes operações:
+
 - **Busca de Operadoras:**  
   Endpoint: `GET /buscar_operadoras?termo=palavra-chave`  
   Retorna até 50 registros filtrados por *Nome Fantasia* ou *Razão Social* (busca case-insensitive).
@@ -148,11 +164,14 @@ A API permite as seguintes operações:
 
 ### Frontend (Vue.js)
 
-A interface web permite:
+A interface web está acessível através de `http://localhost:8080/`
+
+A interface permite:
+
 - **Pesquisar Operadoras:**  
   Preencha o campo de busca e clique em "Buscar" para exibir uma lista filtrada.
 - **Adicionar Operadora:**  
-  Complete o formulário (com validações) e clique em "Adicionar".
+  Complete o formulário e clique em "Adicionar".
 - **Editar Operadora:**  
   Selecione uma operadora, clique em "Editar" para preencher o formulário e, após as alterações, clique em "Atualizar". Apenas os campos alterados serão enviados.
 - **Excluir Operadora:**  
@@ -160,13 +179,18 @@ A interface web permite:
 
 ## Coleção Postman
 
-Na raiz do projeto, encontra-se o arquivo `Coleção_Postman_Operadoras_API.json`.  
-Para utilizar:
-1. Importe o arquivo no Postman.
-2. Clique com o botão direito sobre a coleção importada e escolha a opção **Run Collection**.
-3. Os testes configurados para os endpoints da API serão executados automaticamente.
+> **Atenção:** Certifique-se de que a API esteja rodando em `127.0.0.1:5000` antes de iniciar os testes.
 
-Por enquanto, essa é a única configuração de testes disponível.
+Na raiz do projeto, encontra-se o arquivo `Coleção_Postman_Operadoras_API.json`.
+
+### Instruções de utilização:
+
+1. **Importar a coleção:**  
+   Abra o Postman e importe o arquivo `Coleção_Postman_Operadoras_API.json`.
+2. **Executar os testes:**  
+   Clique com o botão direito sobre a coleção importada e escolha a opção **Run Collection**.
+3. **Visualizar os resultados:**  
+   Os testes configurados para os endpoints da API serão executados automaticamente e você poderá visualizar os resultados na interface do Postman.
 
 ## Testes Automatizados
 
@@ -175,25 +199,10 @@ Para executar os testes, utilize os comandos:
 ```bash
 pytest --cov=src
 ```
-
-Para rodar todos os testes:
-
+ou
 ```bash
-pytest
+pytest --cov
 ```
-
-## Ferramentas de Desenvolvimento
-
-- **flake8:**  
-  Verificação do estilo do código:
-  ```bash
-  flake8 src/ tests/
-  ```
-- **black:**  
-  Formatação automática do código:
-  ```bash
-  black src/ tests/
-  ```
 
 ## Resumo dos Desafios ✅
 
@@ -227,7 +236,6 @@ pytest
 - **Objetivo:** Desenvolver uma interface web que interaja com um servidor.
 - **Concluído:**
   - Utilização de um arquivo CSV previamente preparado no DB.
-  - Implementação de uma rota para busca textual e retorno dos registros mais relevantes.
+  - Implementação de rotas para busca textual, adição, exclusão e edição.
   - Criação de uma coleção Postman para demonstrar os endpoints e testar a API.
-
 </details>

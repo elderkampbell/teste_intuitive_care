@@ -1,81 +1,65 @@
 import os
 import csv
-import pytest  # type: ignore
-from unittest.mock import MagicMock
-from src.extraction import extrair_dados
-
-PASTA_ANEXOS = "anexos"
-PASTA_SAIDA = "saida"
+import pytest
+from io import StringIO
+from unittest.mock import patch, MagicMock
+from src import extraction
 
 
-def test_extrair_dados(mocker):
-    """
-    Testa se a função `extrair_dados` cria um CSV corretamente a partir do PDF mockado.
-    """
-    # Mock da estrutura de um PDF com tabela
-    mock_page = MagicMock()
-    mock_page.extract_tables.return_value = [
-        [
-            [
-                "Procedimento",
-                "RN",
-                "Vigência",
-                "OD",
-                "AMB",
-                "HCO",
-                "HSO",
-                "REF",
-                "PAC",
-                "DUT",
-            ],  # Cabeçalho da tabela
-            [
-                "Consulta Odontológica",
-                "541/2022",
-                "01/08/2022",
-                "OD",
-                "AMB",
-                "",
-                "",
-                "",
-                "",
-                "",
-            ],
-        ]  # Linha de dados simulada
-    ]
+def test_criar_pasta_saida(tmp_path, monkeypatch):
+    fake_saida = tmp_path / "saida"
+    monkeypatch.setattr(extraction, "PASTA_SAIDA", str(fake_saida))
+    extraction.criar_pasta_saida()
+    assert fake_saida.exists()
 
-    # Mock do PDF
-    mock_pdf = MagicMock()
-    mock_pdf.pages = [mock_page]
 
-    # Simula o comportamento do `pdfplumber.open`
-    mocker.patch("pdfplumber.open", return_value=mock_pdf)
+class FakePdf:
+    def __init__(self, pages):
+        self.pages = pages
 
-    # Cria diretórios temporários simulados
-    os.makedirs(PASTA_ANEXOS, exist_ok=True)
+    def __enter__(self):
+        return self
 
-    # Chama a função
-    csv_path = extrair_dados()
+    def __exit__(self, exc_type, exc_val, tb):
+        pass
 
-    # Verifica se o arquivo foi gerado
-    assert os.path.exists(csv_path), "O CSV não foi gerado."
 
-    # Lê o conteúdo do CSV para validação
-    with open(csv_path, "r", encoding="utf-8") as f:
-        reader = csv.reader(f)
-        rows = list(reader)
+def fake_pdf_with_pages():
+    fake_page = MagicMock()
+    fake_page.extract_tables.return_value = [[["col1", "col2"], ["dado1", "dado2"]]]
+    return FakePdf([fake_page])
 
-    print("\nDEBUG: Cabeçalho do CSV ->", rows[0])
-    print(
-        "\nDEBUG: Dados extraídos do CSV ->",
-        rows[1:] if len(rows) > 1 else "Nenhuma linha de dados",
-    )
 
-    # Verifica se há cabeçalho e uma linha de dados
-    assert len(rows) > 1, f"O CSV extraído está vazio. Conteúdo: {rows}"
-    assert (
-        rows[1][0] == "Consulta Odontológica"
-    ), f"Erro na extração dos dados: {rows[1]}"
+@patch("src.extraction.pdfplumber.open", return_value=fake_pdf_with_pages())
+def test_validar_pdf_valid(mock_pdf_open, tmp_path):
+    fake_pdf_path = str(tmp_path / "fake.pdf")
+    open(fake_pdf_path, "w").close()
+    assert extraction.validar_pdf(fake_pdf_path) is True
 
-    # Limpeza
-    os.remove(csv_path)
-    os.rmdir(PASTA_ANEXOS)
+
+def test_processar_pdf(tmp_path):
+    fake_csv = StringIO()
+    writer = csv.writer(fake_csv)
+    fake_pdf_obj = fake_pdf_with_pages()
+    with patch("src.extraction.pdfplumber.open", return_value=fake_pdf_obj):
+        extraction.processar_pdf("dummy.pdf", writer)
+    output = fake_csv.getvalue()
+    assert "dado1" in output
+    assert "dado2" in output
+
+
+def test_extrair_dados(monkeypatch, tmp_path):
+    from src import extraction
+
+    fake_saida = tmp_path / "saida"
+    fake_saida.mkdir()
+    monkeypatch.setattr(extraction, "PASTA_SAIDA", str(fake_saida))
+    # Simula as funções auxiliares para impedir ações reais
+    monkeypatch.setattr(extraction, "criar_pasta_saida", lambda: None)
+    monkeypatch.setattr(extraction, "processar_pdf", lambda pdf, writer: None)
+    monkeypatch.setattr(extraction, "validar_pdf", lambda pdf: True)
+    fake_pdf_path = str(tmp_path / "fake.pdf")
+    open(fake_pdf_path, "w").close()
+    result = extraction.extrair_dados(fake_pdf_path)
+    assert result is not None
+    assert result.endswith("dados_extraidos.csv")

@@ -18,6 +18,7 @@ db_config = {
     "database": "ans_dados",
 }
 
+
 def conectar_banco():
     try:
         conn = pymysql.connect(
@@ -33,6 +34,7 @@ def conectar_banco():
     except Exception as e:
         logging.exception("Erro ao conectar com o banco de dados.")
         return None
+
 
 @app.route("/buscar_operadoras", methods=["GET"])
 def buscar_operadoras():
@@ -62,6 +64,7 @@ def buscar_operadoras():
     finally:
         conn.close()
 
+
 @app.route("/operadoras", methods=["POST"])
 def adicionar_operadora():
     dados = request.json
@@ -83,6 +86,7 @@ def adicionar_operadora():
         return jsonify({"erro": "Erro ao adicionar operadora."}), 500
     finally:
         conn.close()
+
 
 @app.route("/operadoras/<int:id>", methods=["PUT"])
 def atualizar_operadora(id):
@@ -109,6 +113,7 @@ def atualizar_operadora(id):
     finally:
         conn.close()
 
+
 @app.route("/operadoras/<int:id>", methods=["DELETE"])
 def deletar_operadora(id):
     conn = conectar_banco()
@@ -127,6 +132,7 @@ def deletar_operadora(id):
     finally:
         conn.close()
 
+
 def preparar_vue():
     try:
         logging.info("Instalando dependências do Vue.js com npm install...")
@@ -137,6 +143,7 @@ def preparar_vue():
         subprocess.run(["npm", "run", "serve"], cwd="./interface_vue_js", check=True)
     except Exception as e:
         logging.exception("Erro ao preparar o servidor Vue.js.")
+
 
 if __name__ == "__main__":
     vue_thread = threading.Thread(target=preparar_vue)

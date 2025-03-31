@@ -1,6 +1,6 @@
 # Projeto de Extração e Processamento de Dados
 
-Este projeto é uma aplicação para raspagem, extração e processamento de dados de arquivos PDF, além de realizar transformações e compactações nos arquivos gerados. O sistema integra uma API (desenvolvida com Flask) e um frontend (desenvolvido com Vue.js) para gerenciamento dos dados de operadoras extraídos e processados no banco de dados.
+Este projeto é uma aplicação para raspagem, extração e processamento de dados de arquivos PDF, além de realizar transformações e compactações nos arquivos gerados. O sistema integra uma API (desenvolvida com Flask) e um frontend (desenvolvido com Vue.js) para gerenciamento dos dados extraídos e processados no banco de dados.
 
 ## Funcionalidades
 
@@ -23,7 +23,7 @@ Este projeto é uma aplicação para raspagem, extração e processamento de dad
 - **Python 3**  
   Recomenda-se o uso de um ambiente virtual para gerenciar as dependências.
 - **Node.js e npm**  
-- **Banco de Dados MySQL (ou MariaDB)**
+- **Banco de Dados MySQL**
 
 ## Configuração do Ambiente
 
